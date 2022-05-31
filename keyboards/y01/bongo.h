@@ -164,6 +164,7 @@ uint8_t bongo_current_caps_frame     = 0;
 
 // Dynamic bongo variables
 uint8_t bongo_state_tap = 0;
+int current_default_anim = 0;
 
 // assumes 1 frame prep stage
 // mode 0 = default, mode 1 = pre idle
@@ -188,26 +189,23 @@ static void draw_bongo_dynamic(void) {
     led_t   led_state = host_keyboard_led_state();
     uint8_t mod_state = get_mods();
 
-    if ((mod_state & MOD_MASK_CTRL) && bongo_state_tap != 1) {
+    if (((mod_state & MOD_MASK_CTRL) || current_default_anim == 1) && bongo_state_tap != 1) {
         oled_write_raw_P(bongo_hiding[0], DEFAULT_ANIM_SIZE);
         anim_timer      = timer_read32();
         bongo_state_tap = 2;
-    } else if ((mod_state & MOD_MASK_ALT) && bongo_state_tap != 1) {
+    } else if (((mod_state & MOD_MASK_ALT) || current_default_anim == 2) && bongo_state_tap != 1) {
         oled_write_raw_P(bongo_blushing[0], DEFAULT_ANIM_SIZE);
         anim_timer      = timer_read32();
         bongo_state_tap = 2;
     } else if (bongo_state_tap == 1) {
         if (led_state.caps_lock) {
             oled_write_raw_P(bongo_caps[1], DEFAULT_ANIM_SIZE);
-        } else if (mod_state & MOD_MASK_CTRL) {
+        } else if ((mod_state & MOD_MASK_CTRL) || current_default_anim == 1) {
             bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
             oled_write_raw_P(bongo_hiding_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
-        } else if (mod_state & MOD_MASK_ALT) {
+        } else if ((mod_state & MOD_MASK_ALT) || current_default_anim == 2) {
             bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
             oled_write_raw_P(bongo_blushing_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
-        } else if (mod_state & MOD_MASK_SHIFT) {
-            bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
-            oled_write_raw_P(bongo_tap_cute[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
         } else {
             bongo_current_tap_frame = (bongo_current_tap_frame + 1) % BONGO_TAP_FRAMES;
             oled_write_raw_P(bongo_tap[abs((BONGO_TAP_FRAMES - 1) - bongo_current_tap_frame)], DEFAULT_ANIM_SIZE);
@@ -243,7 +241,9 @@ static void draw_bongo_dynamic(void) {
     if (led_state.caps_lock) {
         oled_set_cursor(0, 2);
         oled_write_P(PSTR("CAPS"), false);
-    } else {
-        oled_set_cursor(0, 2);
+    }
+
+    for (int i = 0; i < current_default_anim; i++) {
+        oled_write_pixel(OLED_DISPLAY_WIDTH - 1 - 2 * i, OLED_DISPLAY_HEIGHT - 1, true);
     }
 }
