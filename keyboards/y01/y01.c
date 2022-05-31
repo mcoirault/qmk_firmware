@@ -12,6 +12,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         case KC_RGUI:
             anim_timer = 99;  // forces an animation reset
             return true;
+        case KC_F24:
+            if (record->event.pressed) {
+                current_default_anim = (current_default_anim + 1) % 3;
+            }
+            return false;
     }
     if (record->event.pressed) {
         bongo_state_tap = 1;
