@@ -27,7 +27,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             return false;
         case KC_F24:
             if (record->event.pressed) {
-                current_default_anim = (current_default_anim + 1) % 3;
+                current_default_anim = (current_default_anim + 1) % 4;
             }
             return false;
     }
