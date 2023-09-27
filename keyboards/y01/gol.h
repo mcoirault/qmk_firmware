@@ -1,5 +1,5 @@
-# define GOL_WIDTH  64
-# define GOL_HEIGHT 32
+# define GOL_WIDTH  32
+# define GOL_HEIGHT 16
 
 /* 2D array declaration*/
 static bool current_frame[GOL_WIDTH][GOL_HEIGHT] = {{false}};
@@ -86,7 +86,10 @@ static void reset_gol(void) {
 }
 
 static void draw_gol(void) {
-    oled_clear();
-    iteration();
-    show();
+    if (timer_elapsed32(anim_timer) > 33) {
+        anim_timer = timer_read32();
+        oled_clear();
+        iteration();
+        show();
+    }
 }
