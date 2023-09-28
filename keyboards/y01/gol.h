@@ -1,4 +1,4 @@
-# define GOL_WIDTH  32
+# define GOL_WIDTH  40
 # define GOL_HEIGHT 16
 
 /* 2D array declaration*/
