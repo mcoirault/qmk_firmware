@@ -138,6 +138,8 @@ uint32_t frame_timer          = 0;              // timer used to pace frametime 
 uint8_t  bongo_current_frame  = 0;              // counter to go between frames of a given animation
 bool     bongo_tapped         = false;          // flag set to true by qmk when a key is pressed, used to display tap animations
 uint8_t  bongo_animation      = 0;              // used to cycle through hiding/blush/caps animations
+bool     caps_lock_on;
+uint8_t  mods_state;
 
 void print_text(void) {
     uint8_t highest_layer = get_highest_layer(layer_state);
@@ -147,7 +149,7 @@ void print_text(void) {
         oled_write_char(highest_layer + 0x30, false);
     }
 
-    if (host_keyboard_led_state().caps_lock) {
+    if (caps_lock_on) {
         oled_set_cursor(0, 2);
         oled_write_P(PSTR("CAPS"), false);
     }
@@ -174,18 +176,21 @@ void animate_sleep(void) {
 }
 
 bool is_animation_hiding(void) {
-    return (get_mods() & MOD_MASK_CTRL) || bongo_animation == 1;
+    return (mods_state & MOD_MASK_CTRL) || bongo_animation == 1;
 }
 
 bool is_animation_blushing(void) {
-    return (get_mods() & MOD_MASK_ALT) || bongo_animation == 2;
+    return (mods_state & MOD_MASK_ALT) || bongo_animation == 2;
 }
 
 bool is_animation_caps(void) {
-    return host_keyboard_led_state().caps_lock || bongo_animation == 3;
+    return caps_lock_on || bongo_animation == 3;
 }
 
 static void draw_bongo(void) {
+    mods_state = get_mods();
+    caps_lock_on = host_keyboard_led_state().caps_lock;
+
     if (bongo_tapped) {
         bongo_tapped = false;
         anim_timer = timer_read32();
@@ -210,9 +215,10 @@ static void draw_bongo(void) {
     }
     
     if (!is_animation_hiding() && !is_animation_blushing() && !is_animation_caps()) {
-        if (timer_elapsed32(anim_timer) > SLEEP_TIMEOUT) {
+        uint32_t time_elapsed = timer_elapsed32(anim_timer);
+        if (time_elapsed > SLEEP_TIMEOUT) {
             animate_sleep();
-        } else if (timer_elapsed32(anim_timer) > IDLE_TIMEOUT) {
+        } else if (time_elapsed > IDLE_TIMEOUT) {
             animate_idle();
         }
     }
