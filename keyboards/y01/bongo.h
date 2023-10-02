@@ -150,7 +150,7 @@ uint8_t bongo_current_caps_frame     = 0;
 
 // Dynamic bongo variables
 uint8_t bongo_state_tap = 0;
-int current_default_anim = 0;
+uint8_t current_default_anim = 0;
 
 // assumes 1 frame prep stage
 // mode 0 = default, mode 1 = pre idle
@@ -221,7 +221,7 @@ static void draw_bongo_dynamic(void) {
         }
     }
 
-    int highest_layer = get_highest_layer(layer_state);
+    uint8_t highest_layer = get_highest_layer(layer_state);
     if (highest_layer > 0) {
         oled_set_cursor(19, 2);
         oled_write_P(PSTR("L"), false);
@@ -233,7 +233,7 @@ static void draw_bongo_dynamic(void) {
         oled_write_P(PSTR("CAPS"), false);
     }
 
-    for (int i = 0; i < current_default_anim; i++) {
+    for (uint8_t i = 0; i < current_default_anim; i++) {
         oled_write_pixel(OLED_DISPLAY_WIDTH - 1 - 2 * i, OLED_DISPLAY_HEIGHT - 1, true);
     }
 }

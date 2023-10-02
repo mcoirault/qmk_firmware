@@ -5,12 +5,12 @@
 static bool current_frame[GOL_WIDTH][GOL_HEIGHT] = {{false}};
 static bool next_frame[GOL_WIDTH][GOL_HEIGHT] = {{false}};
 
-int count_neighbors(int i, int j) {
-    int live_neighbors = 0;
-    int previous_column = i-1;
-    int next_column = i+1;
-    int previous_row = j-1;
-    int next_row = j+1;
+uint8_t count_neighbors(uint8_t i, uint8_t j) {
+    uint8_t live_neighbors = 0;
+    uint8_t previous_column = i-1;
+    uint8_t next_column = i+1;
+    uint8_t previous_row = j-1;
+    uint8_t next_row = j+1;
 
     // previous row
     if (previous_column >= 0 && previous_row >= 0 && current_frame[previous_column][previous_row]) {
@@ -51,10 +51,10 @@ int count_neighbors(int i, int j) {
 }
 
 void iteration(void) {
-    int i, j;
+    uint8_t i, j;
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
-            int live_neighbors = count_neighbors(i, j);
+            uint8_t live_neighbors = count_neighbors(i, j);
             if((current_frame[i][j] == 1) && (live_neighbors < 2 || live_neighbors > 3)) {
                 next_frame[i][j] = 0;
             }
@@ -67,7 +67,7 @@ void iteration(void) {
 }
 
 void show(void) {
-    int i, j;
+    uint8_t i, j;
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
             current_frame[i][j] = next_frame[i][j];
@@ -77,7 +77,7 @@ void show(void) {
 }
 
 static void reset_gol(void) {
-    int i,j;
+    uint8_t i,j;
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
             current_frame[i][j] = rand() & 1;
