@@ -2,7 +2,7 @@
 #include "bongo.h"
 #include "gol.h"
 
-bool bongo_displayed = true;
+uint8_t active_animation = 0;
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
@@ -22,18 +22,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             return false;
         case KC_F23:
             if (record->event.pressed) {
-                bongo_displayed = !bongo_displayed;
+                active_animation = (active_animation + 1) % 3;
             }
             return false;
         case KC_F24:
             if (record->event.pressed) {
-                current_default_anim = (current_default_anim + 1) % 4;
+                bongo_animation = (bongo_animation + 1) % BONGO_ANIMATIONS;
             }
             return false;
     }
+
     if (record->event.pressed) {
-        bongo_state_tap = 1;
+        bongo_tapped = true;
     }
+
     return true;
 }
 
@@ -44,11 +46,13 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 bool oled_task_user(void) {
-    if (bongo_displayed) {
-        draw_bongo_dynamic();
-    }
-    else {
-        draw_gol();
+    switch (active_animation) {
+        case 1:
+            draw_gol();
+            break;
+        default:
+            draw_bongo();
+            break;
     }
     return false;
 }
