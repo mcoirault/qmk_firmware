@@ -1,5 +1,6 @@
 # define GOL_WIDTH  40
 # define GOL_HEIGHT 16
+# define GOL_FRAME_TIME 75
 
 /* 2D array declaration*/
 static bool current_frame[GOL_WIDTH][GOL_HEIGHT] = {{false}};
@@ -71,7 +72,10 @@ void show(void) {
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
             current_frame[i][j] = next_frame[i][j];
-            oled_write_pixel(i, j, current_frame[i][j] == 1);
+            oled_write_pixel(i * 2, j * 2, current_frame[i][j] == 1);
+            oled_write_pixel(i * 2 + 1, j * 2, current_frame[i][j] == 1);
+            oled_write_pixel(i * 2, j * 2 + 1, current_frame[i][j] == 1);
+            oled_write_pixel(i * 2 + 1, j * 2 + 1, current_frame[i][j] == 1);
         }
     }
 }
@@ -86,7 +90,7 @@ static void reset_gol(void) {
 }
 
 static void draw_gol(void) {
-    if (timer_elapsed32(anim_timer) > 33) {
+    if (timer_elapsed32(anim_timer) > GOL_FRAME_TIME) {
         anim_timer = timer_read32();
         oled_clear();
         iteration();
