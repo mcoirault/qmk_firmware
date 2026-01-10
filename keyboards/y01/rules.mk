@@ -1,18 +1,8 @@
 # Build Options
 #   change yes to no to disable
 #
-EXTRAKEY_ENABLE = yes       # Audio control and System control
-NKRO_ENABLE = yes           # Enable N-Key Rollover
-WPM_ENABLE = yes
-VIA_ENABLE = yes
 
-CONSOLE_ENABLE = no         # Console for debug
-COMMAND_ENABLE = no         # Commands for debug and configuration
-BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
-RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
-AUDIO_ENABLE = no
 SPACE_CADET_ENABLE = no
-MUSIC_ENABLE = no
 MAGIC_ENABLE = no
 GRAVE_ESC_ENABLE = no
 AVR_USE_MINIMAL_PRINTF = yes

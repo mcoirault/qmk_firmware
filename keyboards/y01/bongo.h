@@ -152,7 +152,7 @@ uint8_t  mods_state;
 
 void print_text(void) {
     uint8_t highest_layer = get_highest_layer(layer_state);
-    
+
     oled_set_cursor(19, 2);
     if (highest_layer > 0) {
         oled_write_P(PSTR("L"), false);
