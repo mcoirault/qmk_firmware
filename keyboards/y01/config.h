@@ -1,17 +1,6 @@
 #pragma once
 
-/* key matrix size */
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 15
-
-/* key matrix pins */
-#define MATRIX_ROW_PINS { F0, F1, C7, D5, B7 }
-#define MATRIX_COL_PINS { B0, F4, F5, F6, F7, B1, B3, B2, B6, B5, B4, E6, D7, C6, D4 }
-
 #define OLED_UPDATE_INTERVAL 66
 
-#undef LOCKING_SUPPORT_ENABLE
-#undef LOCKING_RESYNC_ENABLE
 #define NO_ACTION_ONESHOT
-// #define NO_ACTION_TAPPING
-#define NO_MUSIC_MODE
+

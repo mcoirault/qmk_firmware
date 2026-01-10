@@ -1,10 +1,10 @@
-#include "y01.h"
+#include "quantum.h"
 #include "bongo.h"
 #include "gol.h"
 
 uint8_t active_animation = 0;
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case KC_CAPS:
         case KC_LCTL:
@@ -22,7 +22,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             return false;
         case KC_F23:
             if (record->event.pressed) {
-                active_animation = (active_animation + 1) % 3;
+                active_animation = (active_animation + 1) % 2;
             }
             return false;
         case KC_F24:
@@ -40,12 +40,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 }
 
 #ifdef OLED_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
     srand(timer_read());
     return OLED_ROTATION_180;
 }
 
-bool oled_task_user(void) {
+bool oled_task_kb(void) {
     switch (active_animation) {
         case 1:
             draw_gol();
