@@ -15,6 +15,11 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
         case KC_RGUI:
             anim_timer = 99;  // forces an animation reset
             return true;
+        case KC_F21:
+            if (record->event.pressed) {
+                draw_gliders();
+            }
+            return false;
         case KC_F22:
             if (record->event.pressed) {
                 reset_gol();
