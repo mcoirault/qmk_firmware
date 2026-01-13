@@ -1,16 +1,19 @@
 # define GOL_WIDTH  40
 # define GOL_HEIGHT 16
-# define GOL_FRAME_TIME 75
+# define GOL_FRAME_TIME 66
 # define GOL_GLIDER_SIZE 3
 
 /* 2D array declaration*/
-static bool current_frame[GOL_WIDTH][GOL_HEIGHT] = {{false}};
-static bool next_frame[GOL_WIDTH][GOL_HEIGHT]    = {{false}};
-static bool glider[GOL_GLIDER_SIZE][GOL_GLIDER_SIZE] = {
+bool current_frame[GOL_WIDTH][GOL_HEIGHT]        = {{false}};
+bool next_frame[GOL_WIDTH][GOL_HEIGHT]           = {{false}};
+bool glider[GOL_GLIDER_SIZE][GOL_GLIDER_SIZE]    = {
     {false, true,  false},
     {false, false, true},
     {true,  true,  true}
 };
+
+int live_count  = 0;
+int birth_count = 0;
 
 uint8_t count_neighbors(uint8_t i, uint8_t j) {
     uint8_t live_neighbors  = 0;
@@ -59,6 +62,8 @@ uint8_t count_neighbors(uint8_t i, uint8_t j) {
 
 void iteration(void) {
     uint8_t i, j;
+    live_count = 0;
+    birth_count = 0;
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
             uint8_t live_neighbors = count_neighbors(i, j);
@@ -67,6 +72,10 @@ void iteration(void) {
             }
             else if((current_frame[i][j] == 0) && (live_neighbors == 3)) {
                 next_frame[i][j] = 1;
+                live_count++;
+                birth_count++;
+            } else if (current_frame[i][j] == 1) {
+                live_count++;
             }
         }
     }
@@ -86,16 +95,7 @@ void show(void) {
     }
 }
 
-static void reset_gol(void) {
-    uint8_t i,j;
-    for (i = 0; i < GOL_WIDTH; i++) {
-        for (j = 0; j < GOL_HEIGHT; j++) {
-            current_frame[i][j] = rand() & 1;
-        }
-    }
-}
-
-static void blank_gol(void) {
+void blank_gol(void) {
     uint8_t i,j;
     for (i = 0; i < GOL_WIDTH; i++) {
         for (j = 0; j < GOL_HEIGHT; j++) {
@@ -106,21 +106,77 @@ static void blank_gol(void) {
 }
 
 void draw_glider(uint8_t origin_i, uint8_t origin_j) {
-    uint8_t i, j;
-    for (i = 0; i < GOL_GLIDER_SIZE; i++) {
-        for (j = 0; j < GOL_GLIDER_SIZE; j++) {
+    for (uint8_t i = 0; i < GOL_GLIDER_SIZE; i++) {
+        for (uint8_t j = 0; j < GOL_GLIDER_SIZE; j++) {
             next_frame[origin_i + i][origin_j + j] = glider[i][j];
+        }
+    }
+}
+
+void draw_box(uint8_t origin_i, uint8_t origin_j) {
+    for (uint8_t i = 0; i < 3; i++) {
+        for (uint8_t j = 0; j < 3; j++) {
+            if (i == 1 && j == 1) {
+                continue;
+            }
+            next_frame[origin_i + i][origin_j + j] = true;
+        }
+    }
+}
+
+void draw_tub(uint8_t origin_i, uint8_t origin_j) {
+    next_frame[origin_i + 1][origin_j] = true;
+    next_frame[origin_i][origin_j + 1] = true;
+    next_frame[origin_i + 2][origin_j + 1] = true;
+    next_frame[origin_i + 1][origin_j + 2] = true;
+}
+
+void draw_stats(void) {
+    oled_set_cursor(15, 2);
+    oled_write_P(PSTR("L "), false);
+    oled_write(get_u8_str(live_count, ' '), false);
+    oled_set_cursor(15, 3);
+    oled_write_P(PSTR("B "), false);
+    oled_write(get_u8_str(birth_count, ' '), false);
+}
+
+static void reset_gol(void) {
+    uint8_t i,j;
+    for (i = 0; i < GOL_WIDTH; i++) {
+        for (j = 0; j < GOL_HEIGHT; j++) {
+            current_frame[i][j] = rand() & 1;
         }
     }
 }
 
 static void draw_gliders(void) {
     blank_gol();
+
     uint8_t glider_origin;
     for (glider_origin = 0; glider_origin < GOL_WIDTH; glider_origin = glider_origin + 8) {
         uint8_t j = 8 + (rand() % 4);
         draw_glider(glider_origin, j);
     }
+}
+
+static void draw_pulsar(uint8_t origin_i, uint8_t origin_j) {
+    blank_gol();
+
+    draw_box(origin_i, origin_j);
+    draw_box(origin_i + 6, origin_j);
+}
+
+static void draw_eureka(uint8_t origin_i, uint8_t origin_j) {
+    blank_gol();
+
+    // offset to accomodate for the full height of the oscillator
+    origin_j = origin_j + 2;
+    draw_box(origin_i + 9, origin_j + 1);
+    draw_box(origin_i + 9, origin_j + 7);
+    draw_tub(origin_i, origin_j);
+    draw_tub(origin_i, origin_j + 8);
+    draw_tub(origin_i + 15, origin_j);
+    draw_tub(origin_i + 15, origin_j + 8);
 }
 
 static void draw_gol(void) {
@@ -129,5 +185,6 @@ static void draw_gol(void) {
         oled_clear();
         iteration();
         show();
+        draw_stats();
     }
 }
